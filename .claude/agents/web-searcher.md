@@ -1,6 +1,6 @@
 ---
 name: web-searcher
-description: "联网搜索专用代理。主程序需要查询外部信息、了解技术文档、搜索最新资讯、核实事实时，必须且只能调用此代理完成。严禁主程序直接使用 WebSearch、WebFetch 或通过 Bash（curl、wget、Invoke-WebRequest 等命令）搜索网络内容来绕过此代理。违反此规则将导致信息来源不可控。"
+description: "联网搜索专用代理（强制）。主程序需查询外部信息时必须且只能调用此代理完成。严禁主程序直接使用 WebSearch、WebFetch 或通过 Bash（curl、wget、Invoke-WebRequest 等命令）搜索网络内容来绕过此代理。违反此规则将导致信息来源不可控。"
 tools: WebSearch, WebFetch
 disallowedTools: Bash, Read, Grep, Glob, Agent
 model: haiku
