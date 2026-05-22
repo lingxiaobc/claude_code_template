@@ -1,6 +1,6 @@
 ---
 name: project-searcher
-description: "项目内容搜索专用代理。主程序需要了解项目结构、搜索代码、查找文件、理解模块功能时，必须且只能调用此代理完成。严禁主程序直接使用 Grep、Glob、Read 或通过 Bash（find、grep、rg、cat、head、tail 等命令）搜索项目内容来绕过此代理。违反此规则将导致搜索结果不可复现。"
+description: "项目搜索专用代理（强制）。主程序需了解项目结构、搜索代码、查找文件时必须且只能调用此代理完成。严禁主程序直接使用 Grep、Glob、Read 或通过 Bash（find、grep、rg、cat、head、tail 等命令）搜索项目内容来绕过此代理。违反此规则将导致搜索结果不可复现。"
 tools: Read, Grep, Glob
 disallowedTools: Bash, WebSearch, WebFetch, Agent
 model: haiku
