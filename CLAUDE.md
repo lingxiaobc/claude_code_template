@@ -22,8 +22,9 @@
 ```
 
 **核心机制：**
-- **强制代理模式**：项目搜索必须通过 `project-searcher`，网络搜索必须通过 `web-searcher`，主程序不得直接使用 Grep/Glob/Read 或 WebSearch/WebFetch 绕过
-- **自动提交**：每次 Edit/Write/NotebookEdit 操作后，`auto-commit.sh` 自动暂存并提交变更（跳过 `.git/` 和 `settings.local.json`）
+- **强制代理模式**：项目搜索必须通过 `project-searcher`，网络搜索必须通过 `web-searcher`，主程序不得直接使用 Grep/Glob/Read 或 WebSearch/WebFetch 或通过 Bash 命令（curl、wget、find、grep 等）绕过
+- **代理模型**：代理默认使用 haiku 模型，如不可用需修改代理 `.md` 文件中的 `model` 字段
+- **自动提交**：每次 Edit/Write/NotebookEdit 操作后，`auto-commit.sh` 自动暂存并提交变更（跳过 `.git/` 和 `settings.local.json`，跳过 >10MB 文件）
 - **提交格式**：`auto: [update|create] [文件名]`
 
 ## 行为准则
