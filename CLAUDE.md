@@ -15,8 +15,10 @@
 │   └── web-searcher.md      # 联网搜索代理（强制代理，禁止主程序绕过）
 ├── hooks/            # 自动化钩子
 │   └── auto-commit.sh       # PostToolUse 自动提交脚本
-├── settings.json     # 主配置（模型、API、权限）
-└── settings.local.json     # 本地覆盖（钩子配置，已在 .gitignore 中）
+├── skills/           # 自定义技能
+│   └── plan-tasks/          # 大规模变更任务规划技能
+├── settings.json     # 主配置（钩子、共享设置）
+└── settings.local.json     # 本地覆盖（API 密钥、模型配置，已在 .gitignore 中）
 ```
 
 **核心机制：**
