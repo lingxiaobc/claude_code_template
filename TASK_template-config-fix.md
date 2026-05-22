@@ -1,7 +1,7 @@
 # 任务计划：模板项目配置全面修复
 
 **创建时间**：2026-05-22
-**状态**：进行中
+**状态**：已完成
 
 ## 目标
 
@@ -10,23 +10,23 @@
 ## 变更范围
 
 - 涉及模块：`.claude/` 全部配置文件、根目录文档
-- 预计影响文件数：8（修改 6 个文件，新建 1 个文件，删除后重建 1 个文件）
+- 预计影响文件数：8（修改 5 个文件，新建 3 个文件）
 
 ## 任务明细
 
 ### 阶段一：核心配置修复（高优先级）
-- [ ] 创建 README.md：模板仓库文档，包含项目简介、快速开始、目录结构、配置说明
-- [ ] 修复 auto-commit.sh：Windows 路径兼容、Python 命令回退、git add 错误处理、大文件保护、日志输出
-- [ ] 修复 settings.local.json：token 替换为占位符、清理冗余环境变量、添加 permissions deny 规则
+- [x] 创建 README.md：模板仓库文档，包含项目简介、快速开始、目录结构、配置说明
+- [x] 修复 auto-commit.sh：Windows 路径兼容、Python 命令回退、git add 错误处理、大文件保护、日志输出
+- [x] 创建 settings.local.json.example：token 替换为占位符、清理冗余环境变量、添加 permissions deny 规则
 
 ### 阶段二：配置增强（中优先级）
-- [ ] 修复 settings.json：matcher 正则添加锚定
-- [ ] 修复 web-searcher.md：验证并修正工具引用
-- [ ] 统一 CLAUDE.md 与 SKILL.md 触发条件描述
+- [x] 修复 settings.json：matcher 正则添加锚定
+- [x] 修复 web-searcher.md：精简描述，保留 Bash 禁止说明
+- [x] 统一 CLAUDE.md 与 SKILL.md 触发条件描述
 
 ### 阶段三：文档与细节完善（低优先级）
-- [ ] 精简 project-searcher.md 和 web-searcher.md 代理描述
-- [ ] 更新 CLAUDE.md 架构图（补充 skills/ 目录）并添加代理模型说明
+- [x] 精简 project-searcher.md 代理描述，保留 Bash 禁止说明
+- [x] 更新 CLAUDE.md 架构图（补充 skills/ 目录）并添加代理模型说明
 
 ## 完成标准
 
