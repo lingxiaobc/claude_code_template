@@ -1,94 +1,174 @@
 # Claude Code 项目模板
 
-一键初始化带有完整 AI 辅助开发环境的项目模板。内置多代理协作架构、自动提交钩子、20+ 专业技能，开箱即用。
+一键初始化带有完整 AI 辅助开发环境的项目模板。内置多代理协作架构、Worktree 安全隔离、自动提交钩子、20+ 专业技能，开箱即用。
+
+## 这是什么？
+
+如果你在用 [Claude Code](https://docs.anthropic.com/en/docs/claude-code)（Anthropic 官方 CLI 工具）写代码，这个模板帮你：
+
+- **不用每次从零配置** — 克隆即用，`.claude/` 目录下已经配好了代理、钩子、技能
+- **多代理协作** — 主程序调度，子代理干活，互不干扰
+- **安全隔离** — 子代理在独立 worktree 中改代码，主程序审核通过后才合并，不会搞坏你的主分支
+- **自动提交** — 每次文件改动自动生成 commit，不怕丢进度
 
 ## 快速开始
 
+### 前提条件
+
+- 已安装 [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code)
+- 有可用的 Anthropic API 密钥（或兼容的 API 服务）
+
+### 3 步初始化
+
 ```bash
-# 1. 克隆模板
-git clone <此仓库地址> <你的项目名>
+# 1. 克隆模板到你的新项目目录
+git clone https://gitee.com/lingxiaobc/claude_code_template.git <你的项目名>
 cd <你的项目名>
 
-# 2. 重置为你的仓库
+# 2. 重置 Git 为你自己的仓库
 rm -rf .git
 git init
 
-# 3. 配置 API 密钥
+# 3. 配置你的 API 密钥
 cp .claude/settings.local.json.example .claude/settings.local.json
-# 编辑 settings.local.json，填入你的 API 地址和认证令牌
+# 编辑 settings.local.json，填入你的 API 地址和认证令牌（见下方"配置"章节）
 
 # 4. 提交初始状态
 git add .
 git commit -m "init: 项目初始化"
 ```
 
-启动 Claude Code 后即可直接使用，无需额外配置。
+启动 Claude Code（在终端运行 `claude`），即可开始使用。
 
-## 架构概览
+## 目录结构
 
 ```
-.claude/
-├── agents/                   # 专用子代理
-│   ├── project-searcher.md   #   项目内容搜索（强制）
-│   └── web-searcher.md       #   联网搜索（强制）
-├── hooks/                    # 自动化钩子
-│   └── auto-commit.sh        #   文件变更自动提交
-├── skills/                   # 技能库（20+ 技能）
-│   ├── plan-tasks/           #   任务规划（主程序专属）
-│   ├── skill-creator/        #   技能创建（主程序专属）
-│   ├── backend-engineering-workflow/
-│   ├── frontend-development-workflow/
-│   ├── database-engineering/
-│   ├── claude-api/
-│   └── ...                   #   更多技能见下方列表
-├── settings.json             # 共享配置（提交至仓库）
-└── settings.local.json       # 本地配置（API 密钥，不提交）
+你的项目/
+├── .claude/                        # Claude Code 配置目录
+│   ├── agents/                     # 子代理定义
+│   │   ├── project-searcher.md     #   项目内搜索代理
+│   │   └── web-searcher.md         #   联网搜索代理
+│   ├── hooks/                      # 自动化钩子
+│   │   └── auto-commit.sh          #   文件变更自动提交
+│   ├── skills/                     # 技能库（20+ 技能）
+│   │   ├── plan-tasks/             #   任务规划（主程序专属）
+│   │   ├── skill-creator/          #   技能创建（主程序专属）
+│   │   └── ...                     #   其他技能
+│   ├── settings.json               # 共享配置（提交至仓库）
+│   └── settings.local.json         # 你的本地配置（API 密钥，不提交）
+├── CLAUDE.md                       # 行为准则和架构说明
+└── README.md                       # 本文件
 ```
 
-## 核心机制
+## 核心概念
 
-### 多代理协作
+### 主程序 vs 子代理
 
-主程序作为调度者和审核者，不直接执行任务，而是委派给子代理完成：
+这个模板的核心思路是 **"主程序不动手，子代理干脏活"**：
 
-- **独立任务** → 并行开多个子代理同时执行
-- **有关联的任务** → 通过 Team 协作组协调，共享任务列表和信息
-- **主程序全程把控方向**，审核产出，发现偏差时及时干预修正
+| 角色 | 职责 | 类比 |
+|------|------|------|
+| **主程序** | 接收请求、规划任务、审核结果、把控方向 | 项目经理 |
+| **子代理** | 编码、搜索、查资料等具体执行工作 | 开发工程师 |
+
+### Worktree 隔离（安全机制）
+
+子代理改代码时**不会直接改你的主分支**。流程如下：
+
+```
+子代理收到任务
+  │
+  ▼
+在独立 worktree（工作副本）中修改文件
+  │
+  ▼
+主程序审核变更内容
+  │
+  ├── 审核通过 → 合并到 main 分支，清理 worktree
+  │
+  └── 审核不通过 → 退回子代理修正
+```
+
+这意味着即使子代理改出了问题代码，你的 main 分支也不会被污染。
 
 ### 强制代理
 
-所有搜索操作必须通过专用代理，主程序不得绕过：
+搜索操作必须通过专用代理，主程序不能直接搜索：
 
-| 代理 | 职责 | 可用工具 |
-|------|------|----------|
-| `project-searcher` | 项目内搜索（文件、代码、目录） | Grep, Glob, Read |
-| `web-searcher` | 联网查询（文档、API、外部信息） | WebSearch, WebFetch |
+| 代理 | 作用 | 怎么用 |
+|------|------|--------|
+| `project-searcher` | 在项目内搜索文件和代码 | 查文件在哪、查函数定义、查引用 |
+| `web-searcher` | 联网搜索外部信息 | 查文档、查 API 用法、查技术方案 |
 
 ### 自动提交
 
-每次文件编辑（Edit/Write/NotebookEdit）后，`auto-commit.sh` 自动暂存并提交：
+每次文件编辑后，`auto-commit.sh` 会自动生成一条 commit：
+- 提交格式：`auto: update 文件名` 或 `auto: create 文件名`
 - 自动跳过 `.git/`、`settings.local.json`、大于 10MB 的文件
-- 提交格式：`auto: [update|create] <文件名>`
+
+## 配置说明
+
+### settings.local.json（你的本地配置）
+
+这个文件存放你的 API 密钥等敏感信息，已在 `.gitignore` 中，**不会提交到仓库**。
+
+复制示例文件后编辑：
+
+```bash
+cp .claude/settings.local.json.example .claude/settings.local.json
+```
+
+完整格式参考 `settings.local.json.example`，需要你填写的字段：
+
+```json
+{
+    "model": "sonnet",
+    "availableModels": ["sonnet", "opus", "haiku", "opusplan"],
+    "effortLevel": "high",
+    "env": {
+        "ANTHROPIC_BASE_URL": "填你的 API 地址",
+        "ANTHROPIC_AUTH_TOKEN": "填你的认证令牌",
+        "ANTHROPIC_DEFAULT_OPUS_MODEL": "opus 模型名称",
+        "ANTHROPIC_DEFAULT_SONNET_MODEL": "sonnet 模型名称",
+        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "haiku 模型名称"
+    },
+    "permissions": {
+        "allow": []
+    }
+}
+```
+
+| 字段 | 说明 |
+|------|------|
+| `ANTHROPIC_BASE_URL` | API 服务地址（第三方兼容服务填对应地址） |
+| `ANTHROPIC_AUTH_TOKEN` | 认证令牌 |
+| `ANTHROPIC_DEFAULT_*_MODEL` | 各级别模型的实际名称（按你的服务商要求填写） |
+
+示例文件中还包含团队协作、遥测开关等环境变量，一般保持默认即可，详见 `.claude/settings.local.json.example`。
+
+### settings.json（共享配置）
+
+钩子定义和团队共享设置，提交至仓库。当前配置了 PostToolUse 自动提交钩子。
 
 ## 技能列表
 
-技能分为两类：**主程序专属**（仅主程序可调用）和**通用技能**（可授权给子代理）。
+技能是预定义的工作流模板，按需使用。
 
 ### 主程序专属
 
 | 技能 | 说明 |
 |------|------|
-| `plan-tasks` | 大规模变更的任务规划，在 `TASK/` 目录生成结构化任务明细，逐项跟踪 |
+| `plan-tasks` | 大规模变更任务规划，生成结构化任务清单 |
 | `skill-creator` | 创建和管理新技能 |
 
 ### 开发工作流
 
 | 技能 | 说明 |
 |------|------|
-| `backend-engineering-workflow` | 后端服务全流程：API 开发、数据库集成、性能优化、测试 |
-| `frontend-development-workflow` | 前端开发全流程：UI 构建、组件开发、状态管理 |
-| `database-engineering` | 数据库工程：Schema 设计、迁移、查询优化、索引策略 |
-| `claude-api` | Claude API / Anthropic SDK 应用的构建、调试和优化 |
+| `backend-engineering-workflow` | 后端全流程：API、数据库、测试 |
+| `frontend-development-workflow` | 前端全流程：UI、组件、状态管理 |
+| `database-engineering` | 数据库：Schema、迁移、查询优化 |
+| `claude-api` | Claude API / Anthropic SDK 开发 |
 | `mcp-builder` | MCP 服务器构建 |
 | `webapp-testing` | Web 应用测试 |
 
@@ -98,9 +178,9 @@ git commit -m "init: 项目初始化"
 |------|------|
 | `frontend-design` | 前端 UI 设计 |
 | `canvas-design` | Canvas 可视化设计 |
-| `algorithmic-art` | 基于 p5.js 的生成艺术 |
+| `algorithmic-art` | p5.js 生成艺术 |
 | `theme-factory` | 主题/样式工厂 |
-| `brand-guidelines` | 品牌规范设计 |
+| `brand-guidelines` | 品牌规范 |
 | `web-artifacts-builder` | Web 组件构建 |
 
 ### 文档与办公
@@ -108,73 +188,11 @@ git commit -m "init: 项目初始化"
 | 技能 | 说明 |
 |------|------|
 | `doc-coauthoring` | 文档协作撰写 |
-| `docx` | Word 文档生成 |
-| `pdf` | PDF 文档处理 |
-| `pptx` | PowerPoint 演示文稿生成 |
-| `xlsx` | Excel 电子表格处理 |
+| `docx` | Word 文档 |
+| `pdf` | PDF 处理 |
+| `pptx` | PowerPoint 演示文稿 |
+| `xlsx` | Excel 表格 |
 | `internal-comms` | 内部沟通文档 |
-
-### 其他
-
-| 技能 | 说明 |
-|------|------|
-| `slack-gif-creator` | Slack GIF 动图创建 |
-
-## 任务执行流程
-
-```
-用户请求
-  │
-  ▼
-主程序接收 → 分析需求，判断是否需要任务规划
-  │
-  ├── 简单任务（单文件/单函数级别）
-  │     └── 直接委派单个子代理执行
-  │
-  └── 复杂任务（多文件/多模块）
-        │
-        ▼
-    plan-tasks 生成任务计划（TASK/ 目录）
-        │
-        ▼
-    分析任务依赖关系
-        │
-        ├── 独立任务 → 并行开子代理执行
-        │
-        └── 关联任务 → Team 协作组执行
-              │
-              ▼
-        审核子代理产出 ←→ 发现偏差则退回修正
-              │
-              ▼
-        所有任务完成 → 汇报结果
-```
-
-## 配置说明
-
-### settings.local.json（本地配置）
-
-每个开发者独立配置，不提交至仓库：
-
-```json
-{
-    "model": "sonnet",
-    "availableModels": ["sonnet", "opus", "haiku"],
-    "effortLevel": "high",
-    "env": {
-        "ANTHROPIC_BASE_URL": "你的 API 地址",
-        "ANTHROPIC_AUTH_TOKEN": "你的认证令牌",
-        "ANTHROPIC_DEFAULT_SONNET_MODEL": "模型名称",
-        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "模型名称"
-    }
-}
-```
-
-参考 `settings.local.json.example` 创建。
-
-### settings.json（共享配置）
-
-钩子定义和团队共享设置，提交至仓库。当前配置了 PostToolUse 自动提交钩子。
 
 ## 自定义扩展
 
@@ -196,15 +214,52 @@ model: haiku
 
 ### 添加新技能
 
-使用主程序调用 `skill-creator` 技能，或在 `.claude/skills/` 下创建子目录和 `SKILL.md`。
+用主程序调用 `/skill-creator` 技能，或在 `.claude/skills/` 下手动创建。
 
 ### 修改钩子
 
-编辑 `.claude/settings.json` 中的 `hooks` 配置，钩子脚本放在 `.claude/hooks/` 目录。
+编辑 `.claude/settings.json` 中的 `hooks` 部分，钩子脚本放在 `.claude/hooks/`。
 
-## 注意事项
+## 任务执行流程
 
-- `settings.local.json` 已在 `.gitignore` 中，敏感信息不会泄露
-- `auto-commit.sh` 兼容 Windows Git Bash 和 Linux/macOS
-- 代理默认使用 haiku 模型以控制成本，可在各代理 `.md` 文件中修改 `model` 字段
-- `plan-tasks` 和 `skill-creator` 为主程序专属技能，不可委托给子代理
+```
+你的请求
+  │
+  ▼
+主程序接收 → 分析需求
+  │
+  ├── 简单任务（改个变量、加个函数）
+  │     └── 单个子代理在 worktree 中完成
+  │
+  └── 复杂任务（多文件、多模块）
+        │
+        ▼
+    plan-tasks 生成任务清单
+        │
+        ▼
+    分析任务依赖
+        │
+        ├── 无依赖 → 多个子代理并行执行（各自独立 worktree）
+        │
+        └── 有关联 → Team 协作组（共享任务列表）
+              │
+              ▼
+    主程序审核每个 worktree 中的变更
+        │
+        ├── 通过 → 合并到 main
+        └── 不通过 → 退回修正
+```
+
+## 常见问题
+
+**Q: 自动提交太吵了，能关掉吗？**
+编辑 `.claude/settings.json`，删除 `hooks` 部分。
+
+**Q: 子代理默认用 haiku 模型，太弱了怎么办？**
+编辑对应代理的 `.md` 文件，把 `model: haiku` 改成 `model: sonnet`。
+
+**Q: 我想用自己的 API 服务（非官方）？**
+在 `settings.local.json` 中设置 `ANTHROPIC_BASE_URL` 和 `ANTHROPIC_AUTH_TOKEN` 即可。
+
+**Q: `settings.local.json` 会被提交吗？**
+不会，它已在 `.gitignore` 中。
