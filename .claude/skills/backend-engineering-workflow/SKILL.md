@@ -1,6 +1,6 @@
 ---
 name: backend-engineering-workflow
-description: "End-to-end backend engineering workflow for building backend services, creating or modifying APIs, optimizing performance, detecting backend risks, refactoring or rewriting backend code, adding tests, and verifying server behavior. Use when the user asks to build a backend, create a server, implement backend features, add REST/GraphQL/RPC endpoints, improve backend performance, debug backend behavior, review backend code, rewrite backend modules, add database logic, adjust authentication or authorization, or harden backend quality. Do NOT use for frontend-only work, deployment-only tasks with no backend code change, database-only analysis with no service change, or high-level architecture discussion with no implementation."
+description: "End-to-end backend engineering workflow for building backend services, creating, modifying, optimizing, debugging, testing, and documenting server endpoints, detecting backend risks, refactoring or rewriting backend code, and verifying server behavior. Use when the user asks to build a backend, create a server, implement backend features, add or adjust REST APIs, GraphQL resolvers, RPC handlers, controllers, routes, request validation, response schemas, authentication, authorization, pagination, filtering, sorting, OpenAPI/Swagger specs, backend integration tests, performance/error handling, database logic, or backend quality hardening. Do NOT use for frontend-only work, deployment-only tasks with no backend code change, database-only analysis with no service change, or high-level architecture discussion with no implementation."
 ---
 
 # Backend Engineering Workflow
@@ -25,6 +25,7 @@ Load these references only when needed:
 
 - `references/project-recon.md`: Use during Inspect to identify framework, runtime, commands, routes, tests, database, auth, and docs.
 - `references/task-diagnosis.md`: Use during Diagnose to classify the task as build, feature, API, bug, optimization, security, refactor, rewrite, or tests.
+- `references/api-development.md`: Use for endpoint-focused REST, GraphQL, RPC, controller, route, request/response, OpenAPI, or HTTP verification work.
 - `references/api-contract.md`: Use whenever the task changes API behavior, request/response schemas, auth, status codes, or side effects.
 - `references/implementation-patterns.md`: Use during Implement for layering, validation, errors, logging, external calls, docs, and dependency rules.
 - `references/optimization-workflow.md`: Use for performance, query, memory, latency, throughput, cache, or N+1 work.
@@ -81,6 +82,8 @@ Classify the task before planning. Determine whether it is:
 - Documentation or schema update
 
 The task type changes the workflow. For example, bug fixes need reproduction, optimizations need baseline measurements, and rewrites need behavior-locking tests.
+
+For endpoint-focused API work, load `references/api-development.md` after diagnosis and use it with `references/api-contract.md`.
 
 For detailed guidance, read `references/task-diagnosis.md`.
 

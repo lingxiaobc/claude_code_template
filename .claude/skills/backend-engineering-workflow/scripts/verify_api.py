@@ -92,6 +92,8 @@ def json_path(data: Any, path: str) -> Any:
     current = data
     parts = path[2:].split(".") if path.startswith("$.") else path.split(".")
     for part in parts:
+        if part == "":
+            continue
         if isinstance(current, list):
             current = current[int(part)]
         elif isinstance(current, dict):
@@ -120,10 +122,10 @@ def run_case(base_url: str, case: dict[str, Any], timeout: float) -> dict[str, A
     url = url_for(base_url, str(case.get("path", "/")))
     headers = {str(k): str(v) for k, v in case.get("headers", {}).items()}
     body = encode_body(case, headers)
-    expected_status = int(case.get("expectStatus", 200))
+    expected_status = int(case.get("expectStatus", case.get("expectedStatus", 200)))
     started = time.time()
     result: dict[str, Any] = {
-        "name": case.get("name") or url,
+        "name": case.get("name") or case.get("path") or url,
         "method": method,
         "url": url,
         "expectedStatus": expected_status,
@@ -157,7 +159,8 @@ def run_case(base_url: str, case: dict[str, Any], timeout: float) -> dict[str, A
     result["checks"].append({"name": "status", "passed": status == expected_status, "expected": expected_status, "actual": status})
 
     parsed: Any = None
-    if text.strip().startswith(("{", "[")) or "json" in response_headers.get("Content-Type", "").lower():
+    content_type = response_headers.get("Content-Type", response_headers.get("content-type", ""))
+    if text and (text.strip().startswith(("{", "[")) or "json" in content_type.lower()):
         try:
             parsed = json.loads(text)
             result["json"] = parsed

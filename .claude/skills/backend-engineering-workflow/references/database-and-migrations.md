@@ -51,6 +51,17 @@ For list endpoints:
 - Add metadata if the project does.
 - Consider indexes for new filters or sort keys.
 
+## Filters And Sorting
+
+Use allowlisted fields.
+
+Avoid passing raw user-controlled strings into:
+
+- SQL column names
+- ORM order objects
+- Include or expand relation names
+- Raw where clauses
+
 ## Delete Behavior
 
 Before deleting:
@@ -60,6 +71,19 @@ Before deleting:
 - Check tenant/ownership filters.
 - Check audit requirements.
 - Check whether related resources block deletion.
+
+## Performance
+
+Watch for:
+
+- N+1 queries
+- Overfetching large relations
+- Missing indexes for new filters or sort keys
+- Large JSON serialization
+- Unbounded joins
+- Per-row external service calls
+
+Prefer targeted query changes over broad rewrites.
 
 ## Test Data
 

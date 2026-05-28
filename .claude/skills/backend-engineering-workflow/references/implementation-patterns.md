@@ -80,3 +80,43 @@ Update existing documentation systems when present:
 - API collections
 
 Do not create a parallel documentation system.
+
+## API Optimization And Adjustment
+
+When optimizing or adjusting an existing API:
+
+1. Identify the bottleneck from code, logs, query plans, tests, or measurable symptoms.
+2. Preserve the public contract unless the user requests a breaking change.
+3. Prefer targeted fixes: indexes, query shape, pagination, batching, caching, serialization, or N+1 reduction.
+4. Add regression tests where behavior could change.
+5. Measure before and after when the environment supports it.
+
+Avoid speculative rewrites.
+
+## Backward Compatibility
+
+Before changing an existing endpoint or public service behavior:
+
+- Check existing tests and docs.
+- Keep existing response fields unless removing them is requested.
+- Add optional fields instead of changing field meaning.
+- Preserve status-code semantics where clients may depend on them.
+- Consider versioning if behavior changes substantially.
+
+## Tests
+
+Add or update focused tests when there is a test path.
+
+Useful tests:
+
+- Happy path
+- Validation failure
+- Unauthorized
+- Forbidden
+- Not found
+- Conflict
+- Pagination, filtering, and sorting behavior
+- Database write side effects
+- External service failure with mocks
+
+Prefer integration tests for route behavior and unit tests for complex business logic.

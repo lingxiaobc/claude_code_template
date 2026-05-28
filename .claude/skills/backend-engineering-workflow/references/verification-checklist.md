@@ -14,6 +14,23 @@ Run project-native commands when available:
 - Build
 - Schema generation
 
+## Test Coverage
+
+For new or changed endpoints, cover:
+
+- Happy path
+- Invalid request body
+- Invalid path or query parameter
+- Unauthenticated request if auth applies
+- Authenticated but forbidden request if permissions apply
+- Resource not found
+- Conflict or uniqueness issue when relevant
+- Pagination, filtering, and sorting behavior when relevant
+- Database write side effects
+- External service failure when relevant
+
+If the project has no test infrastructure, use HTTP smoke checks and report the gap.
+
 ## HTTP Checks
 
 When a server can run:
@@ -25,6 +42,15 @@ When a server can run:
 5. Confirm write side effects when practical.
 
 Use `scripts/verify_api.py` for generic HTTP checks.
+
+## API Documentation Checks
+
+If the project has API docs:
+
+- Confirm OpenAPI or Swagger generation succeeds.
+- Confirm documented request and response match implementation.
+- Confirm GraphQL schema generation succeeds.
+- Confirm typed client generation succeeds if present.
 
 ## Risk Scan
 

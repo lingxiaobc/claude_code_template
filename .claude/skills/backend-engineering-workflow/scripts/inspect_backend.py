@@ -128,12 +128,6 @@ def inside_bundled_backend_skill(path: Path) -> bool:
         resolved.relative_to(this_skill)
         return True
     except ValueError:
-        pass
-    try:
-        repo_skills = Path(__file__).resolve().parents[2]
-        resolved.relative_to(repo_skills / "backend-api-development")
-        return True
-    except ValueError:
         return False
 
 

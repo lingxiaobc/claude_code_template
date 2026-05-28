@@ -61,6 +61,31 @@ Find similar code before creating new patterns:
 
 Nearby code is usually more reliable than generic best practices.
 
+## Data Sources
+
+Confirm data shape from authoritative sources:
+
+- ORM schema such as Prisma, TypeORM entity, Sequelize model, SQLAlchemy model, Django model, GORM model, or JPA entity
+- Migrations
+- SQL schema files
+- GraphQL schema
+- OpenAPI schema
+- Existing repository or query code
+
+If a field, relation, enum, table, or cascade behavior cannot be found, do not invent it.
+
+## Auth And Permissions
+
+Locate:
+
+- Authentication middleware, guards, decorators, dependencies, or filters
+- Current-user or session extraction
+- Role, permission, tenant, organization, or ownership checks
+- Existing unauthorized and forbidden error behavior
+- Test helpers for authenticated requests
+
+Writing endpoints without confirmed auth behavior is risky. Ask the user if auth requirements are ambiguous and the endpoint writes or exposes sensitive data.
+
 ## Commands
 
 Identify commands from project files:
