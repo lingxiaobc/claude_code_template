@@ -1,7 +1,52 @@
+# ─── Claude Code 本地配置 ───
 .claude/settings.local.json
+
+# ─── 通用临时/日志文件 ───
 *.tmp
 *.log
+
+# ─── Node.js ───
 node_modules/
 package.json
 package-lock.json
+
+# ─── plan-tasks 技能产物 ───
+TASK/
+
+# ─── skill-creator 技能产物 ───
+*-workspace/
+iteration-*/
+evals/
+*.skill
+benchmark.json
+benchmark.md
+feedback.json
+timing.json
+grading.json
+eval_metadata.json
+
+# ─── mcp-builder 技能产物 ───
+evaluation.xml
+
+# ─── web-artifacts-builder 技能产物 ───
+bundle.html
+
+# ─── webapp-testing 技能产物 ───
+/tmp/
+
+# ─── pptx/docx/xlsx/pdf 技能产物 ───
+*.pptx
+*.docx
+*.xlsx
+*.pdf
+unpacked/
+output.pdf
+output.txt
+output.xlsx
+slide-*.jpg
+page-*.jpg
+extracted_tables.xlsx
 create_pptx.js
+
+# ─── slack-gif-creator 技能产物 ───
+*.gif
