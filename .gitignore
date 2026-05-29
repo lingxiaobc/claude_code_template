@@ -1,3 +1,7 @@
 .claude/settings.local.json
 *.tmp
 *.log
+node_modules/
+package.json
+package-lock.json
+create_pptx.js
