@@ -10,10 +10,19 @@ Output:
 
 import argparse
 import base64
+import io
 import json
+import os
 import sys
 import time
 from pathlib import Path
+
+# Windows 兼容：确保 stdout 使用 utf-8 编码
+if sys.platform == "win32":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8",
+                                  errors="replace")
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8",
+                                  errors="replace")
 
 try:
     import requests
