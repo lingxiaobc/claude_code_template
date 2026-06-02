@@ -45,7 +45,7 @@ def load_api_key(config_path=None):
     优先级：环境变量 ZENMUX_API_KEY > 配置文件 env.ZENMUX_API_KEY
     """
     # 1. 环境变量
-    key = __import__("os").environ.get("ZENMUX_API_KEY", "").strip()
+    key = os.environ.get("ZENMUX_API_KEY", "").strip()
     if key:
         return key
 
