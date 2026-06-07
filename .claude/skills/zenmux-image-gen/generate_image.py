@@ -77,6 +77,19 @@ def load_api_key(config_path=None):
     return ""
 
 
+def _create_session():
+    """创建带自动重试的 requests Session。"""
+    from requests.adapters import HTTPAdapter
+    from urllib3.util.retry import Retry
+
+    session = requests.Session()
+    retries = Retry(total=3, backoff_factor=2,
+                    status_forcelist=[500, 502, 503, 504])
+    session.mount("https://", HTTPAdapter(max_retries=retries))
+    session.mount("http://", HTTPAdapter(max_retries=retries))
+    return session
+
+
 def generate_image(prompt, size, quality, api_key, output_format=None,
                    output_compression=None, background=None):
     """调用 ZenMux API 生成图片，返回响应 JSON。"""
@@ -100,8 +113,9 @@ def generate_image(prompt, size, quality, api_key, output_format=None,
     if background:
         body["background"] = background
 
-    response = requests.post(API_URL, headers=headers, json=body,
-                             timeout=REQUEST_TIMEOUT)
+    session = _create_session()
+    response = session.post(API_URL, headers=headers, json=body,
+                            timeout=REQUEST_TIMEOUT)
     response.raise_for_status()
     return response.json()
 
