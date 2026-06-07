@@ -52,7 +52,7 @@ python .claude/skills/zenmux-image-gen/generate_image.py \
   --prompt "构建好的英文prompt" \
   --output "./output/generated_TIMESTAMP.png" \
   --size "1024x1024" \
-  --quality "high"
+  --quality "medium"
 ```
 
 - 输出路径默认：`./output/generated_YYYYMMDD_HHMMSS.png`
