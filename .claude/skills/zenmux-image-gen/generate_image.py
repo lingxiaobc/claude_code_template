@@ -36,7 +36,7 @@ except ImportError:
 
 API_URL = "https://zenmux.ai/api/v1/images/generations"
 MODEL = "openai/gpt-image-2"
-REQUEST_TIMEOUT = 120
+REQUEST_TIMEOUT = 180
 
 
 def load_api_key(config_path=None):
@@ -91,7 +91,6 @@ def generate_image(prompt, size, quality, api_key, output_format=None,
         "n": 1,
         "size": size,
         "quality": quality,
-        "response_format": "b64_json",
     }
 
     if output_format:
