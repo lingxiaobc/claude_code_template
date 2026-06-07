@@ -195,54 +195,63 @@ def main():
                           error="--output-compression 必须在 0-100 之间")
             sys.exit(1)
 
-    # 带重试的生图
+    # 质量降级链：high 连接失败时自动降级到 medium
+    quality_fallback = ["high", "medium"] if args.quality == "high" else [args.quality]
     last_error = ""
-    for attempt in range(1, args.max_retries + 1):
-        try:
-            response_data = generate_image(
-                prompt=args.prompt,
-                size=args.size,
-                quality=args.quality,
-                api_key=api_key,
-                output_format=args.output_format,
-                output_compression=args.output_compression,
-                background=args.background,
-            )
-            image_path = save_image(response_data, args.output)
-            output_result(True, attempt, image_path=image_path)
-            sys.exit(0)
+    attempt = 0
 
-        except requests.exceptions.HTTPError as e:
-            status_code = e.response.status_code if e.response is not None else "unknown"
+    for quality_level in quality_fallback:
+        for retry in range(1, args.max_retries + 1):
+            attempt += 1
             try:
-                error_body = e.response.json() if e.response is not None else {}
-                error_msg = error_body.get("error", {}).get("message", str(e))
-            except (json.JSONDecodeError, AttributeError):
-                error_msg = str(e)
-            last_error = f"HTTP {status_code}: {error_msg}"
-            if status_code in (401, 403):
-                # 认证失败不重试
+                response_data = generate_image(
+                    prompt=args.prompt,
+                    size=args.size,
+                    quality=quality_level,
+                    api_key=api_key,
+                    output_format=args.output_format,
+                    output_compression=args.output_compression,
+                    background=args.background,
+                )
+                image_path = save_image(response_data, args.output)
+                actual_quality = quality_level
+                if quality_level != args.quality:
+                    actual_quality = f"{quality_level} (auto-downgraded from {args.quality})"
+                output_result(True, attempt, image_path=image_path)
+                sys.exit(0)
+
+            except requests.exceptions.HTTPError as e:
+                status_code = e.response.status_code if e.response is not None else "unknown"
+                try:
+                    error_body = e.response.json() if e.response is not None else {}
+                    error_msg = error_body.get("error", {}).get("message", str(e))
+                except (json.JSONDecodeError, AttributeError):
+                    error_msg = str(e)
+                last_error = f"HTTP {status_code}: {error_msg}"
+                if status_code in (401, 403):
+                    break
+                if status_code == 422:
+                    break
+
+            except requests.exceptions.Timeout:
+                last_error = f"请求超时（{REQUEST_TIMEOUT}秒），请稍后重试"
+
+            except requests.exceptions.ConnectionError:
+                last_error = "网络连接失败，请检查网络"
+                # high 质量连接失败 → 跳出重试循环，尝试降级
+                if quality_level == "high":
+                    break
+
+            except ValueError as e:
+                last_error = str(e)
                 break
-            if status_code == 422:
-                # 内容被拒不重试
+
+            except Exception as e:
+                last_error = f"未知错误: {str(e)}"
                 break
 
-        except requests.exceptions.Timeout:
-            last_error = "请求超时（120秒），请稍后重试"
-
-        except requests.exceptions.ConnectionError:
-            last_error = "网络连接失败，请检查网络"
-
-        except ValueError as e:
-            last_error = str(e)
-            break
-
-        except Exception as e:
-            last_error = f"未知错误: {str(e)}"
-            break
-
-        if attempt < args.max_retries:
-            time.sleep(2)
+            if retry < args.max_retries:
+                time.sleep(2)
 
     output_result(False, attempt, error=last_error)
     sys.exit(1)
