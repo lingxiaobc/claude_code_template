@@ -17,7 +17,7 @@ description: Generate images using AI via ZenMux platform. Use this skill when u
 | 风格 | 融入prompt文本 | 摄影/插画/油画/水彩/动漫/赛博朋克/极简/3D渲染 | 自然摄影 |
 | 用途 | 影响size推断 | 头像/壁纸/手机壁纸/海报/博客配图 | 通用 |
 | 尺寸 | size字段 | 1024x1024, 1024x1536, 1536x1024, auto | 1024x1024 |
-| 清晰度 | quality字段 | low, medium, high, auto | high |
+| 清晰度 | quality字段 | low, medium, high, auto | medium |
 
 **用途到尺寸映射**：
 - 头像/图标 → 1024x1024
