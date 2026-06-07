@@ -161,9 +161,9 @@ def main():
     parser.add_argument("--size", default="1024x1024",
                         choices=["1024x1024", "1024x1536", "1536x1024", "auto"],
                         help="图片尺寸 (默认: 1024x1024)")
-    parser.add_argument("--quality", default="high",
+    parser.add_argument("--quality", default="medium",
                         choices=["low", "medium", "high", "auto"],
-                        help="图片质量 (默认: high)")
+                        help="图片质量 (默认: medium)")
     parser.add_argument("--output-format", default=None,
                         choices=["png", "jpeg", "webp"],
                         help="输出格式 (默认: png)")
